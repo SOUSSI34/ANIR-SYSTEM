@@ -1,3 +1,7 @@
+// ========================================
+// ANIR SYSTEM V4
+// ========================================
+
 const quests = [
   {
     name: "Future Quest",
@@ -6,7 +10,6 @@ const quests = [
     xp: 10,
     stat: "int"
   },
-
   {
     name: "Body Quest",
     description: "Train or run for 30–60 minutes.",
@@ -14,7 +17,6 @@ const quests = [
     xp: 10,
     stat: "vit"
   },
-
   {
     name: "Mind Quest",
     description: "Learn something useful for 15 minutes.",
@@ -24,18 +26,14 @@ const quests = [
   }
 ];
 
+const STORAGE_KEY = "ANIR_SYSTEM_V4";
 
 let system =
-  JSON.parse(localStorage.getItem("ANIR_SYSTEM_V3")) || {
-
+  JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
     totalXP: 0,
-
     streak: 0,
-
     lastDate: null,
-
     completedToday: [],
-
     todayXP: 0,
 
     stats: {
@@ -46,72 +44,80 @@ let system =
     },
 
     challengeStart: null
-
   };
 
 
-const today =
-  new Date().toISOString().split("T")[0];
+// ========================================
+// DATE
+// ========================================
 
+function getToday() {
+  const date = new Date();
 
-function save() {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
 
-  localStorage.setItem(
-    "ANIR_SYSTEM_V3",
-    JSON.stringify(system)
-  );
-
+  return `${year}-${month}-${day}`;
 }
 
+const today = getToday();
+
+
+// ========================================
+// SAVE
+// ========================================
+
+function save() {
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(system)
+  );
+}
+
+
+// ========================================
+// NEW DAY
+// ========================================
 
 function checkNewDay() {
 
   if (!system.challengeStart) {
-
     system.challengeStart = today;
-
   }
-
 
   if (system.lastDate === today) {
     return;
   }
 
-
   if (system.lastDate) {
 
-    const yesterday = new Date();
+    const last = new Date(system.lastDate);
+    const current = new Date(today);
 
-    yesterday.setDate(
-      yesterday.getDate() - 1
-    );
+    const difference =
+      Math.floor(
+        (current - last) /
+        (1000 * 60 * 60 * 24)
+      );
 
-    const yesterdayString =
-      yesterday.toISOString().split("T")[0];
-
-
-    if (
-      system.lastDate !==
-      yesterdayString
-    ) {
-
+    // If more than one day was missed
+    if (difference > 1) {
       system.streak = 0;
-
     }
-
   }
 
-
   system.completedToday = [];
-
   system.todayXP = 0;
-
   system.lastDate = today;
 
   save();
-
 }
 
+
+// ========================================
+// LEVEL
+// ========================================
 
 function getLevel() {
 
@@ -122,6 +128,10 @@ function getLevel() {
 }
 
 
+// ========================================
+// RANK
+// ========================================
+
 function getRank(level) {
 
   if (level >= 50) return "S-RANK";
@@ -131,73 +141,171 @@ function getRank(level) {
   if (level >= 5) return "D-RANK";
 
   return "E-RANK";
-
 }
 
+
+// ========================================
+// XP
+// ========================================
+
+function addXP(amount) {
+
+  const oldLevel = getLevel();
+
+  system.totalXP += amount;
+  system.todayXP += amount;
+
+  const newLevel = getLevel();
+
+  if (newLevel > oldLevel) {
+
+    alert(
+      `⚔️ LEVEL UP!\n\n` +
+      `You reached Level ${newLevel}!`
+    );
+  }
+}
+
+
+// ========================================
+// COMPLETE QUEST
+// ========================================
 
 function completeQuest(index) {
 
   if (
     system.completedToday.includes(index)
   ) {
-
     return;
-
   }
-
 
   const quest = quests[index];
 
+  if (!quest) {
+    return;
+  }
 
-  system.totalXP += quest.xp;
+  // XP
+  addXP(quest.xp);
 
-  system.todayXP += quest.xp;
-
-
+  // Mark completed
   system.completedToday.push(index);
 
-
-  // Increase related stat
-
+  // Increase main stat
   system.stats[quest.stat] += 1;
 
 
-  // AGI gets a small bonus from running/body
-
-  if (
-    index === 1 &&
-    system.stats.agi < 100
-  ) {
-
+  // Body Quest → AGI bonus
+  if (index === 1) {
     system.stats.agi += 1;
-
   }
 
+
+  // ====================================
+  // DAILY COMPLETE BONUS
+  // ====================================
 
   if (
     system.completedToday.length ===
     quests.length
   ) {
 
-    system.totalXP += 20;
-
-    system.todayXP += 20;
+    addXP(20);
 
     system.streak += 1;
 
     alert(
-      "⚔️ DAILY QUEST COMPLETE!\n\n+20 BONUS XP"
+      "⚔️ DAILY QUEST COMPLETE!\n\n" +
+      "+20 BONUS XP\n" +
+      `🔥 STREAK: ${system.streak} DAYS`
     );
-
   }
 
 
   save();
-
   render();
-
 }
 
+
+// ========================================
+// QUEST HTML
+// ========================================
+
+function createQuestHTML(
+  quest,
+  index
+) {
+
+  const completed =
+    system.completedToday.includes(index);
+
+
+  return `
+    <article
+      class="quest ${completed ? "completed" : ""}"
+    >
+
+      <div class="quest-icon">
+        ${quest.icon}
+      </div>
+
+      <div class="quest-info">
+
+        <h3>
+          ${quest.name}
+        </h3>
+
+        <p>
+          ${quest.description}
+        </p>
+
+        <span>
+          +${quest.xp} XP
+        </span>
+
+      </div>
+
+      <button
+        class="complete-btn"
+        data-index="${index}"
+        ${completed ? "disabled" : ""}
+      >
+        ${completed ? "✓" : "+"}
+      </button>
+
+    </article>
+  `;
+}
+
+
+// ========================================
+// BUTTONS
+// ========================================
+
+function attachQuestButtons(container) {
+
+  container
+    .querySelectorAll(".complete-btn")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          completeQuest(
+            Number(button.dataset.index)
+          );
+
+        }
+      );
+
+    });
+}
+
+
+// ========================================
+// HOME
+// ========================================
 
 function renderHome() {
 
@@ -212,7 +320,8 @@ function renderHome() {
 
 
   document.getElementById("rank")
-    .textContent = getRank(level);
+    .textContent =
+    getRank(level);
 
 
   document.getElementById("xpText")
@@ -252,20 +361,26 @@ function renderHome() {
   container.innerHTML = "";
 
 
-  quests.forEach((quest, index) => {
+  quests.forEach(
+    (quest, index) => {
 
-    container.innerHTML += createQuestHTML(
-      quest,
-      index
-    );
+      container.innerHTML +=
+        createQuestHTML(
+          quest,
+          index
+        );
 
-  });
+    }
+  );
 
 
   attachQuestButtons(container);
-
 }
 
+
+// ========================================
+// QUESTS PAGE
+// ========================================
 
 function renderQuests() {
 
@@ -276,14 +391,17 @@ function renderQuests() {
   container.innerHTML = "";
 
 
-  quests.forEach((quest, index) => {
+  quests.forEach(
+    (quest, index) => {
 
-    container.innerHTML += createQuestHTML(
-      quest,
-      index
-    );
+      container.innerHTML +=
+        createQuestHTML(
+          quest,
+          index
+        );
 
-  });
+    }
+  );
 
 
   attachQuestButtons(container);
@@ -298,9 +416,7 @@ function renderQuests() {
 
   const difference =
     Math.floor(
-      (
-        now - start
-      ) /
+      (now - start) /
       (1000 * 60 * 60 * 24)
     ) + 1;
 
@@ -312,87 +428,16 @@ function renderQuests() {
     );
 
 
-  document.getElementById("challengeDay")
-    .textContent =
+  document.getElementById(
+    "challengeDay"
+  ).textContent =
     `DAY ${day} / 90`;
-
 }
 
 
-function createQuestHTML(
-  quest,
-  index
-) {
-
-  const completed =
-    system.completedToday.includes(index);
-
-
-  return `
-
-    <article
-      class="quest
-      ${completed ? "completed" : ""}"
-    >
-
-      <div class="quest-icon">
-        ${quest.icon}
-      </div>
-
-      <div class="quest-info">
-
-        <h3>
-          ${quest.name}
-        </h3>
-
-        <p>
-          ${quest.description}
-        </p>
-
-        <span>
-          +${quest.xp} XP
-        </span>
-
-      </div>
-
-      <button
-        class="complete-btn"
-        data-index="${index}"
-        ${completed ? "disabled" : ""}
-      >
-        ${completed ? "✓" : "+"}
-      </button>
-
-    </article>
-
-  `;
-
-}
-
-
-function attachQuestButtons(container) {
-
-  container
-    .querySelectorAll(".complete-btn")
-    .forEach(button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          completeQuest(
-            Number(
-              button.dataset.index
-            )
-          );
-
-        }
-      );
-
-    });
-
-}
-
+// ========================================
+// STATS
+// ========================================
 
 function renderStats() {
 
@@ -403,11 +448,14 @@ function renderStats() {
   document.getElementById("strValue")
     .textContent = stats.str;
 
+
   document.getElementById("agiValue")
     .textContent = stats.agi;
 
+
   document.getElementById("vitValue")
     .textContent = stats.vit;
+
 
   document.getElementById("intValue")
     .textContent = stats.int;
@@ -417,13 +465,16 @@ function renderStats() {
     .style.width =
     `${Math.min(stats.str, 100)}%`;
 
+
   document.getElementById("agiBar")
     .style.width =
     `${Math.min(stats.agi, 100)}%`;
 
+
   document.getElementById("vitBar")
     .style.width =
     `${Math.min(stats.vit, 100)}%`;
+
 
   document.getElementById("intBar")
     .style.width =
@@ -438,14 +489,16 @@ function renderStats() {
 
 
   document.getElementById("powerValue")
-    .textContent =
-    power;
+    .textContent = power;
 
 
   renderAchievements();
-
 }
 
+
+// ========================================
+// ACHIEVEMENTS
+// ========================================
 
 function renderAchievements() {
 
@@ -454,7 +507,8 @@ function renderAchievements() {
     {
       icon: "🌱",
       name: "First Step",
-      description: "Complete your first quest.",
+      description:
+        "Complete your first quest.",
       unlocked:
         system.totalXP >= 10
     },
@@ -462,7 +516,8 @@ function renderAchievements() {
     {
       icon: "⚔️",
       name: "Warrior",
-      description: "Reach 100 total XP.",
+      description:
+        "Reach 100 total XP.",
       unlocked:
         system.totalXP >= 100
     },
@@ -470,7 +525,8 @@ function renderAchievements() {
     {
       icon: "🔥",
       name: "Consistency",
-      description: "Reach a 7 day streak.",
+      description:
+        "Reach a 7 day streak.",
       unlocked:
         system.streak >= 7
     },
@@ -478,7 +534,8 @@ function renderAchievements() {
     {
       icon: "👑",
       name: "Elite",
-      description: "Reach Level 10.",
+      description:
+        "Reach Level 10.",
       unlocked:
         getLevel() >= 10
     }
@@ -529,20 +586,12 @@ function renderAchievements() {
 
     }
   );
-
 }
 
 
-function render() {
-
-  renderHome();
-
-  renderQuests();
-
-  renderStats();
-
-}
-
+// ========================================
+// NAVIGATION
+// ========================================
 
 document
   .querySelectorAll(".nav-item")
@@ -595,6 +644,10 @@ document
   });
 
 
+// ========================================
+// RESET
+// ========================================
+
 document
   .getElementById("resetBtn")
   .addEventListener(
@@ -606,14 +659,12 @@ document
           "Are you sure you want to reset ALL progress?"
         )
       ) {
-
         return;
-
       }
 
 
       localStorage.removeItem(
-        "ANIR_SYSTEM_V3"
+        STORAGE_KEY
       );
 
 
@@ -623,6 +674,10 @@ document
   );
 
 
+// ========================================
+// SERVICE WORKER
+// ========================================
+
 if ("serviceWorker" in navigator) {
 
   navigator.serviceWorker.register(
@@ -631,6 +686,10 @@ if ("serviceWorker" in navigator) {
 
 }
 
+
+// ========================================
+// START SYSTEM
+// ========================================
 
 checkNewDay();
 
