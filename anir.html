@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <meta name="theme-color" content="#080808">
+
+  <title>ANIR SYSTEM</title>
+
+  <link rel="stylesheet" href="anir.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+
+<header class="header">
+
+  <div>
+    <p class="system-small">SYSTEM ONLINE</p>
+    <h1>ANIR<span>SYSTEM</span></h1>
+  </div>
+
+  <div id="rank" class="rank">E-RANK</div>
+
+</header>
+
+
+<main>
+
+  <!-- HOME -->
+
+  <section id="homePage" class="page active-page">
+
+    <div class="player-card">
+
+      <div class="player-left">
+
+        <div class="avatar">A</div>
+
+        <div>
+          <p class="player-label">PLAYER</p>
+          <h2>ANIR</h2>
+          <p class="subtitle">
+            Build yourself every day.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="level-box">
+        <span>LVL</span>
+        <strong id="level">1</strong>
+      </div>
+
+    </div>
+
+
+    <div class="xp-card">
+
+      <div class="xp-header">
+        <span>EXPERIENCE</span>
+        <span id="xpText">0 / 100 XP</span>
+      </div>
+
+      <div class="xp-bar">
+        <div id="xpBar"></div>
+      </div>
+
+    </div>
+
+
+    <div class="stats">
+
+      <div class="stat">
+        <div>🔥</div>
+        <p>STREAK</p>
+        <strong id="streak">0</strong>
+      </div>
+
+      <div class="stat">
+        <div>⚡</div>
+        <p>TODAY XP</p>
+        <strong id="todayXP">0</strong>
+      </div>
+
+      <div class="stat">
+        <div>🏆</div>
+        <p>TOTAL XP</p>
+        <strong id="totalXP">0</strong>
+      </div>
+
+    </div>
+
+
+    <div class="section-header">
+      <div>
+        <p class="section-label">TODAY</p>
+        <h2>DAILY QUESTS</h2>
+      </div>
+
+      <span id="questCount">0 / 3</span>
+    </div>
+
+
+    <div id="homeQuests"></div>
+
+
+    <div class="system-message">
+      ⚔️
+      <div>
+        <strong>SYSTEM MESSAGE</strong>
+        <p>
+          Small progress every day creates a stronger version of you.
+        </p>
+      </div>
+    </div>
+
+  </section>
+
+
+
+  <!-- QUESTS -->
+
+  <section id="questsPage" class="page">
+
+    <div class="page-title">
+      <p class="section-label">SYSTEM</p>
+      <h2>QUESTS</h2>
+    </div>
+
+    <div class="challenge-card">
+
+      <div>
+        <p class="section-label">90 DAY CHALLENGE</p>
+
+        <h3>
+          Become Your Strongest Version
+        </h3>
+
+        <p>
+          Complete your daily missions and build consistency.
+        </p>
+      </div>
+
+      <strong id="challengeDay">
+        DAY 1
+      </strong>
+
+    </div>
+
+
+    <div id="allQuests"></div>
+
+  </section>
+
+
+
+  <!-- STATS -->
+
+  <section id="statsPage" class="page">
+
+    <div class="page-title">
+
+      <p class="section-label">PLAYER</p>
+
+      <h2>STATS</h2>
+
+    </div>
+
+
+    <div class="attribute-card">
+
+      <div class="attribute">
+        <div class="attribute-top">
+          <span>💪 STR</span>
+          <strong id="strValue">1</strong>
+        </div>
+
+        <div class="attribute-bar">
+          <div id="strBar"></div>
+        </div>
+      </div>
+
+
+      <div class="attribute">
+        <div class="attribute-top">
+          <span>⚡ AGI</span>
+          <strong id="agiValue">1</strong>
+        </div>
+
+        <div class="attribute-bar">
+          <div id="agiBar"></div>
+        </div>
+      </div>
+
+
+      <div class="attribute">
+        <div class="attribute-top">
+          <span>❤️ VIT</span>
+          <strong id="vitValue">1</strong>
+        </div>
+
+        <div class="attribute-bar">
+          <div id="vitBar"></div>
+        </div>
+      </div>
+
+
+      <div class="attribute">
+        <div class="attribute-top">
+          <span>🧠 INT</span>
+          <strong id="intValue">1</strong>
+        </div>
+
+        <div class="attribute-bar">
+          <div id="intBar"></div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="total-power">
+
+      <p>TOTAL POWER</p>
+
+      <strong id="powerValue">
+        4
+      </strong>
+
+    </div>
+
+
+    <div class="achievements">
+
+      <div class="page-title">
+        <p class="section-label">REWARDS</p>
+        <h2>ACHIEVEMENTS</h2>
+      </div>
+
+
+      <div id="achievementList"></div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- SETTINGS -->
+
+  <section id="settingsPage" class="page">
+
+    <div class="page-title">
+
+      <p class="section-label">SYSTEM</p>
+
+      <h2>SETTINGS</h2>
+
+    </div>
+
+
+    <div class="setting-card">
+
+      <div>
+        <strong>ANIR SYSTEM</strong>
+        <p>Version 3.0</p>
+      </div>
+
+      <span>⚔️</span>
+
+    </div>
+
+
+    <div class="setting-card">
+
+      <div>
+        <strong>PLAYER</strong>
+        <p>ANIR</p>
+      </div>
+
+      <span>👤</span>
+
+    </div>
+
+
+    <button id="resetBtn" class="danger-btn">
+      RESET ALL PROGRESS
+    </button>
+
+  </section>
+
+</main>
+
+
+
+<!-- NAVIGATION -->
+
+<nav class="bottom-nav">
+
+  <button class="nav-item active" data-page="homePage">
+    <span>⌂</span>
+    <small>HOME</small>
+  </button>
+
+  <button class="nav-item" data-page="questsPage">
+    <span>⚔</span>
+    <small>QUESTS</small>
+  </button>
+
+  <button class="nav-item" data-page="statsPage">
+    <span>📊</span>
+    <small>STATS</small>
+  </button>
+
+  <button class="nav-item" data-page="settingsPage">
+    <span>⚙</span>
+    <small>SETTINGS</small>
+  </button>
+
+</nav>
+
+
+<script src="anir.js"></script>
+
+</body>
+</html>
